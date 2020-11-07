@@ -121,14 +121,24 @@
                </div>
             </div>
             {% endfor %}
-            {% for field in form2 %}
             <div class="form-group">
-              <label class="control-label col-xs-4">{{ field.label_tag }}</label>
+              <label class="control-label col-xs-4">Phone Number</label>
               <div class="col-xs-8">
-              {{ field }}
+              {{ form2.pnumber }}
                </div>
             </div>
-            {% endfor %}
+            <div class="form-group">
+              <label class="control-label col-xs-4">Password</label>
+              <div class="col-xs-8">
+              {{ form3.password }}
+               </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-xs-4">Login ID</label>
+              <div class="col-xs-8">
+              {{ form3.loginid }}
+               </div>
+            </div>
 
     		<div class="form-group">
     			<div class="col-xs-8 col-xs-offset-4">
