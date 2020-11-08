@@ -61,7 +61,10 @@ def studentsignup_view(request):
     return render(request,'library/studentsignup.html',context=mydict)
 
 def is_staff(user):
-    return models.Staff.sid!=None
+    if 1==1:
+        return False
+    else:
+        return False
 
 
 def afterlogin_view(request):
@@ -75,28 +78,37 @@ def afterlogin_view(request):
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def addbook_view(request):
-    #now it is empty book form for sending to html
-    form=forms.BookForm()
+    form1=forms.BookForm()
+    form2=forms.Book_AuthorForm()
+    form3=forms.Book_CategoryForm()
+    mydict={'form1':form1,'form2':form2,'form3':form3}
     if request.method=='POST':
-        #now this form have data from html
-        form=forms.BookForm(request.POST)
-        if form.is_valid():
-            user=form.save()
+        form1=forms.BookForm(request.POST)
+        form2=forms.Book_AuthorForm(request.POST)
+        form3=forms.Book_CategoryForm(request.POST)
+        if form1.is_valid() and form2.is_valid() and form3.is_valid():
+            form2.isbn=form1.changed_data['isbn']
+            form3.isbn=form1.changed_data['isbn']
+            form1.save()
+            form2.save()
+            form3.save()
             return render(request,'library/bookadded.html')
-    return render(request,'library/addbook.html',{'form':form})
+    return render(request,'library/addbook.html',context=mydict)
 
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def viewbook_view(request):
-    books=models.Book.objects.all()
-    return render(request,'library/viewbook.html',{'books':books})
+    book1=models.Book.objects.all()
+    book2=models.Book_Author.objects.all()
+    book3=models.Book_Category.objects.all()
+    mydict={'book1':book1,'book2':book2,'book3':book3}
+    return render(request,'library/viewbook.html',context=mydict)
 
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def issuebook_view(request):
     form=forms.IssuedToForm()
     if request.method=='POST':
-        #now this form have data from html
         form=forms.IssuedToForm(request.POST)
         if form.is_valid():
             #obj=models.IssuedBook()
