@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from datetime import datetime,timedelta
 
 class Reader(models.Model):
@@ -15,7 +15,7 @@ class Reader(models.Model):
 
 class Reader_Pno(models.Model):
     userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
-    pnumber=models.IntegerField()
+    pnumber=models.CharField(max_length=10)
 
     def __str__(self):
         return "Reader_Pno"+self.userid+' '+self.pnumber
@@ -105,4 +105,5 @@ class Authenticate(models.Model):
     userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
     sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
     password=models.CharField(max_length=30)
-    loginid=models.CharField(max_length=30, primary_key=True)
+    loginid=models.CharField(max_length=30,primary_key=True)
+   

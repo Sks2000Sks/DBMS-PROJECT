@@ -62,7 +62,7 @@ def studentsignup_view(request):
 
 def is_staff(user):
     if 1==1:
-        return False
+        return True
     else:
         return False
 
@@ -111,7 +111,7 @@ def issuebook_view(request):
     if request.method=='POST':
         form=forms.IssuedToForm(request.POST)
         if form.is_valid():
-            #obj=models.IssuedBook()
+            obj=models.IssuedTo()
             #obj.enrollment=request.POST.get('enrollment2')
             #obj.isbn=request.POST.get('isbn2')
             #obj.save()
