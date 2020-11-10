@@ -12,4 +12,4 @@ admin.site.register(KeepsTrack)
 admin.site.register(PublishedBy)
 admin.site.register(Maintains)
 admin.site.register(IssuedTo)
-admin.site.register(Authenticate)
+

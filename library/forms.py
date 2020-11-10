@@ -1,63 +1,65 @@
 from django import forms
 from django.contrib.auth.models import User
-from library.models import *
-
+from . import models
+#d
+class ReaderUserForm(forms.ModelForm):
+    class Meta:
+        model=User
+        fields=['first_name','last_name','email','password']
+#d
 class ReaderForm(forms.ModelForm):
     class Meta:
-        model=Reader
-        fields='__all__'
-
+        model=models.Reader
+        fields=['isfaculty','dept']
+#d
 class Reader_PnoForm(forms.ModelForm):
     class Meta:
-        model=Reader_Pno
-        fields='__all__'
+        model=models.Reader_Pno
+        fields=['pnumber']
 
 class BookForm(forms.ModelForm):
     class Meta:
-        model=Book
+        model=models.Book
         fields='__all__'
 
 class Book_CategoryForm(forms.ModelForm):
     class Meta:
-        model=Book_Category
-        fields='__all__'
+        model=models.Book_Category
+        fields=['category']
 #
 class Book_AuthorForm(forms.ModelForm):
     class Meta:
-        model=Book_Author
-        fields='__all__'
+        model=models.Book_Author
+        fields=['author']
 
 class PublisherForm(forms.ModelForm):
     class Meta:
-        model=Publisher
+        model=models.Publisher
         fields='__all__'
 
+#d
 class StaffForm(forms.ModelForm):
     class Meta:
-        model=Staff
-        fields='__all__'
+        model=User
+        fields=['first_name','last_name','email','password']
 
 class KeepsTrackForm(forms.ModelForm):
     class Meta:
-        model=KeepsTrack
+        model=models.KeepsTrack
         fields='__all__'
         
 class PublishedByForm(forms.ModelForm):
     class Meta:
-        model=PublishedBy
+        model=models.PublishedBy
         fields='__all__'
 
 class MaintainsForm(forms.ModelForm):
     class Meta:
-        model=Maintains
+        model=models.Maintains
         fields='__all__'
 
 class IssuedToForm(forms.ModelForm):
     class Meta:
-        model=IssuedTo
+        model=models.IssuedTo
         fields='__all__'
 
-class AuthenticateForm(forms.ModelForm):
-    class Meta:
-        model=Authenticate
-        fields='__all__'

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from . import forms,models
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from datetime import datetime,timedelta,date
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -25,16 +26,15 @@ def staffclick_view(request):
 
 def staffsignup_view(request):
     form1=forms.StaffForm()
-    form2=forms.AuthenticateForm()
-    mydict={'form1':form1,'form2':form2}
+    mydict={'form1':form1}
     if request.method=='POST':
         form1=forms.StaffForm(request.POST)
-        form2=forms.AuthenticateForm(request.POST)
-        if form1.is_valid() and form2.is_valid():
-            form2.sid=form1.cleaned_data['sid']
-            form2.userid=None
-            form1.save()
-            form2.save()
+        if form1.is_valid():
+            user=form1.save()
+            user.set_password(user.password)
+            user.save()
+            my_admin_group = Group.objects.get_or_create(name='ADMIN')
+            my_admin_group[0].user_set.add(user)
             return HttpResponseRedirect('stafflogin')
     return render(request,'library/staffsignup.html',context=mydict)
 
@@ -42,29 +42,31 @@ def staffsignup_view(request):
 
 
 def studentsignup_view(request):
-    form1=forms.ReaderForm()
-    form2=forms.Reader_PnoForm()
-    form3=forms.AuthenticateForm()
+    form1=forms.ReaderUserForm()
+    form2=forms.ReaderForm()
+    form3=forms.Reader_PnoForm()
     mydict={'form1':form1,'form2':form2,'form3':form3}
     if request.method=='POST':
-        form1=forms.ReaderForm(request.POST)
-        form2=forms.Reader_PnoForm(request.POST)
-        form3=forms.AuthenticateForm(request.POST)
+        form1=forms.ReaderUserForm(request.POST)
+        form2=forms.ReaderForm(request.POST)
+        form3=forms.Reader_PnoForm(request.POST)
         if form1.is_valid() and form2.is_valid() and form3.is_valid():
-            form2.userid=form1.cleaned_data['userid']
-            form3.userid=form1.cleaned_data['sid']
-            form3.sid=None
-            form1.save()
-            form2.save()
-            form3.save()
+            user=form1.save()
+            user.set_password(user.password)
+            user.save()
+            f2=form2.save(commit=False)
+            f2.user=user
+            f2.save()
+            f3=form3.save(commit=False)
+            f3.userid=user
+            f3.save()
+            my_student_group = Group.objects.get_or_create(name='STUDENT')
+            my_student_group[0].user_set.add(user)
         return HttpResponseRedirect('studentlogin')
     return render(request,'library/studentsignup.html',context=mydict)
 
 def is_staff(user):
-    if 1==1:
-        return True
-    else:
-        return False
+    return user.groups.filter(name='ADMIN').exists()
 
 
 def afterlogin_view(request):
@@ -87,11 +89,14 @@ def addbook_view(request):
         form2=forms.Book_AuthorForm(request.POST)
         form3=forms.Book_CategoryForm(request.POST)
         if form1.is_valid() and form2.is_valid() and form3.is_valid():
-            form2.isbn=form1.changed_data['isbn']
-            form3.isbn=form1.changed_data['isbn']
-            form1.save()
-            form2.save()
-            form3.save()
+            u1=form1.save()
+            f2=form2.save(commit=False)
+            f3=form3.save(commit=False)
+            f2.isbn=u1.isbn
+            f3.isbn=u1.isbn
+            u1.save()
+            f2.save()
+            f3.save()
             return render(request,'library/bookadded.html')
     return render(request,'library/addbook.html',context=mydict)
 
@@ -112,9 +117,7 @@ def issuebook_view(request):
         form=forms.IssuedToForm(request.POST)
         if form.is_valid():
             obj=models.IssuedTo()
-            #obj.enrollment=request.POST.get('enrollment2')
-            #obj.isbn=request.POST.get('isbn2')
-            #obj.save()
+            obj.save()
             return render(request,'library/bookissued.html')
     return render(request,'library/issuebook.html',{'form':form})
 
@@ -122,12 +125,11 @@ def issuebook_view(request):
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def viewissuedbook_view(request):
-    issuedbooks=models.IssuedBook.objects.all()
+    issuedbooks=models.IssuedTo.objects.all()
     li=[]
     for ib in issuedbooks:
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
         expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)
-        #fine calculation
         days=(date.today()-ib.issuedate)
         print(date.today())
         d=days.days
@@ -138,10 +140,10 @@ def viewissuedbook_view(request):
 
 
         books=list(models.Book.objects.filter(isbn=ib.isbn))
-        students=list(models.StudentExtra.objects.filter(enrollment=ib.enrollment))
+        students=list(models.Reader.objects.filter(userid=ib.user.id))
         i=0
         for l in books:
-            t=(students[i].get_name,students[i].enrollment,books[i].name,books[i].author,issdate,expdate,fine)
+            t=(students[i].get_name,students[i].userid,books[i].title,books[i].isbn,issdate,expdate,fine)
             i=i+1
             li.append(t)
 
@@ -152,14 +154,14 @@ def viewissuedbook_view(request):
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def viewstudent_view(request):
-    students=models.StudentExtra.objects.all()
+    students=models.Reader.objects.all()
     return render(request,'library/viewstudent.html',{'students':students})
 
 
 @login_required(login_url='studentlogin')
 def viewissuedbookbystudent(request):
-    student=models.StudentExtra.objects.filter(user_id=request.user.id)
-    issuedbook=models.IssuedBook.objects.filter(enrollment=student[0].enrollment)
+    student=models.Reader.objects.filter(user_id=request.user.id)
+    issuedbook=models.IssuedTo.objects.filter(isbn=student[0].userid)
 
     li1=[]
 
@@ -167,7 +169,7 @@ def viewissuedbookbystudent(request):
     for ib in issuedbook:
         books=models.Book.objects.filter(isbn=ib.isbn)
         for book in books:
-            t=(request.user,student[0].enrollment,student[0].branch,book.name,book.author)
+            t=(request.user,student[0].userid,student[0].dept,book.title,book.isbn)
             li1.append(t)
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
         expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)

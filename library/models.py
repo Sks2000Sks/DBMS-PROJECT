@@ -1,24 +1,26 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,User
 from datetime import datetime,timedelta
 
 class Reader(models.Model):
-    userid=models.CharField(max_length=50,primary_key=True)
-    email=models.EmailField()
     isfaculty=models.BooleanField()
     dept=models.CharField(max_length=50)
-    fname=models.CharField(max_length=50)
-    lname=models.CharField(max_length=50)
-
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     def __str__(self):
-        return "Reader"+self.userid+' '+self.fname+' '+self.lname
+        return "Reader"+self.user.id+' '+self.user.first_name
+    @property
+    def get_name(self):
+        return self.user.first_name
+    @property
+    def getuserid(self):
+        return self.user.id
 
 class Reader_Pno(models.Model):
     userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
     pnumber=models.CharField(max_length=10)
 
     def __str__(self):
-        return "Reader_Pno"+self.userid+' '+self.pnumber
+        return "Reader_Pno"+self.pnumber
 
 class Book(models.Model): 
     isbn=models.CharField(max_length=30,primary_key=True,unique=True)
@@ -59,20 +61,17 @@ class Publisher(models.Model):
         return "Publisher"+self.pname+' '+self.pid
 
 class Staff(models.Model):
-    fsname=models.CharField(max_length=30)
-    lsname=models.CharField(max_length=30)
-    sid=models.CharField(max_length=30,primary_key=True)
-    
+    user=models.OneToOneField(User,on_delete=models.CASCADE)   
 
     def __str__(self):
-        return "Staff"+self.sid+' '+self.fsname+' '+self.lsname
+        return "Staff"+str(self.user.id)+' '+str(self.user.first_name)
 
 class KeepsTrack(models.Model):
     sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
     userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
 
     def __str__(self):
-        return "KeepsTrack"+self.sid+' '+self.userid
+        return "KeepsTrack"
 
 class PublishedBy(models.Model):
     isbn=models.ForeignKey(Book,on_delete=models.CASCADE)
@@ -87,23 +86,17 @@ class Maintains(models.Model):
     sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Maintains"+self.isbn+' '+self.pid
+        return "Maintains"
 
 def get_expiry():
     return datetime.today() + timedelta(days=15)
 class IssuedTo(models.Model):
     isbn=models.ForeignKey(Book,on_delete=models.CASCADE)
-    userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
-    fine=models.IntegerField()
+    userid=models.ForeignKey(User,on_delete=models.CASCADE)
+    fine=models.IntegerField(default=0)
     issuedate=models.DateField(auto_now=True)
     returndate=models.DateField(default=get_expiry)
 
     def __str__(self):
-        return "IssuedTo"+self.userid
+        return "IssuedTo"+str(self.userid.id)
 
-class Authenticate(models.Model):
-    userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
-    sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
-    password=models.CharField(max_length=30)
-    loginid=models.CharField(max_length=30,primary_key=True)
-   
