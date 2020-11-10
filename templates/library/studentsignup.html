@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Sumit</title>
+    <title>StudentSignUp</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -121,24 +121,22 @@
                </div>
             </div>
             {% endfor %}
+            {% for field in form2 %}
             <div class="form-group">
-              <label class="control-label col-xs-4">Phone Number</label>
+              <label class="control-label col-xs-4">{{ field.label_tag }}</label>
               <div class="col-xs-8">
-              {{ form2.pnumber }}
+              {{ field }}
                </div>
             </div>
+            {% endfor %}
+            {% for field in form3 %}
             <div class="form-group">
-              <label class="control-label col-xs-4">Password</label>
+              <label class="control-label col-xs-4">{{ field.label_tag }}</label>
               <div class="col-xs-8">
-              {{ form3.password }}
+              {{ field }}
                </div>
             </div>
-            <div class="form-group">
-              <label class="control-label col-xs-4">Login ID</label>
-              <div class="col-xs-8">
-              {{ form3.loginid }}
-               </div>
-            </div>
+            {% endfor %}
 
     		<div class="form-group">
     			<div class="col-xs-8 col-xs-offset-4">

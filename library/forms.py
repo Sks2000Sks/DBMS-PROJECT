@@ -5,7 +5,7 @@ from . import models
 class ReaderUserForm(forms.ModelForm):
     class Meta:
         model=User
-        fields=['first_name','last_name','email','password']
+        fields=['first_name','last_name','username','email','password']
 #d
 class ReaderForm(forms.ModelForm):
     class Meta:
@@ -41,7 +41,7 @@ class PublisherForm(forms.ModelForm):
 class StaffForm(forms.ModelForm):
     class Meta:
         model=User
-        fields=['first_name','last_name','email','password']
+        fields=['first_name','last_name','username','email','password']
 
 class KeepsTrackForm(forms.ModelForm):
     class Meta:

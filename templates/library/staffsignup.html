@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>LazyCoder || sumit</title>
+    <title>StaffSignUp</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -111,7 +111,7 @@
 
     			<center><h2>Staff Signup</h2></center>
 
-			{% csrf_token %}
+			      {% csrf_token %}
             {% for field in form1 %}
             <div class="form-group">
               <label class="control-label col-xs-4">{{ field.label_tag }}</label>
@@ -121,7 +121,7 @@
             </div>
             {% endfor %}
           
-            <div class="form-group">
+            <!--<div class="form-group">
               <label class="control-label col-xs-4">Password</label>
               <div class="col-xs-8">
               {{ form2.password }}
@@ -133,6 +133,7 @@
               {{ form2.loginid }}
                </div>
             </div>
+            -->
             
           
 

@@ -58,7 +58,7 @@ def studentsignup_view(request):
             f2.user=user
             f2.save()
             f3=form3.save(commit=False)
-            f3.userid=user
+            f3.userid=f2
             f3.save()
             my_student_group = Group.objects.get_or_create(name='STUDENT')
             my_student_group[0].user_set.add(user)
@@ -92,8 +92,8 @@ def addbook_view(request):
             u1=form1.save()
             f2=form2.save(commit=False)
             f3=form3.save(commit=False)
-            f2.isbn=u1.isbn
-            f3.isbn=u1.isbn
+            f2.isbn=u1
+            f3.isbn=u1
             u1.save()
             f2.save()
             f3.save()
@@ -116,7 +116,7 @@ def issuebook_view(request):
     if request.method=='POST':
         form=forms.IssuedToForm(request.POST)
         if form.is_valid():
-            obj=models.IssuedTo()
+            obj=form.save()
             obj.save()
             return render(request,'library/bookissued.html')
     return render(request,'library/issuebook.html',{'form':form})
@@ -129,7 +129,7 @@ def viewissuedbook_view(request):
     li=[]
     for ib in issuedbooks:
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
-        expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)
+        expdate=str(ib.returndate.day)+'-'+str(ib.returndate.month)+'-'+str(ib.returndate.year)
         days=(date.today()-ib.issuedate)
         print(date.today())
         d=days.days
@@ -137,16 +137,13 @@ def viewissuedbook_view(request):
         if d>15:
             day=d-15
             fine=day*10
-
-
-        books=list(models.Book.objects.filter(isbn=ib.isbn))
-        students=list(models.Reader.objects.filter(userid=ib.user.id))
+        books=list(models.Book.objects.filter(isbn=ib.isbn.isbn))
+        students=list(models.Reader.objects.filter(user_id=ib.userid.id))
         i=0
-        for l in books:
-            t=(students[i].get_name,students[i].userid,books[i].title,books[i].isbn,issdate,expdate,fine)
+        for i in books:
+            t=(students[i].get_name,students[i].getuserid,books[i].title,books[i].isbn,issdate,expdate,fine)
             i=i+1
             li.append(t)
-
     return render(request,'library/viewissuedbook.html',{'li':li})
 
 
@@ -171,9 +168,9 @@ def viewissuedbookbystudent(request):
         for book in books:
             t=(request.user,student[0].userid,student[0].dept,book.title,book.isbn)
             li1.append(t)
+        
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
-        expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)
-        #fine calculation
+        expdate=str(ib.returndate.day)+'-'+str(ib.returndate.month)+'-'+str(ib.returndate.year)
         days=(date.today()-ib.issuedate)
         print(date.today())
         d=days.days

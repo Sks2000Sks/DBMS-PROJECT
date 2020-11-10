@@ -59,7 +59,7 @@ border-radius: 5px;
     <br>
     <br>
     <h3 class="p-3 mb-2 bg-primary text-white" style = 'font-size: 50px;text-align:center;'>Available Book in Library !</h3>
-{% if books%}
+{% if book1%}
 <table class="redTable">
   <thead>
     <tr>
@@ -74,13 +74,13 @@ border-radius: 5px;
   </thead>
   <tfoot>
     <tr>
-      <td colspan="4" rowspan="4">
+      <td colspan="7" >
       <div class="links"></div>
       </td>
     </tr>
   </tfoot>
+
   <tbody>
-  
     <tr>
       {% for a in book1 %}
       <td>{{a.title}}</td>
