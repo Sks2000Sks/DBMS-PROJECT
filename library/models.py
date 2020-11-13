@@ -2,13 +2,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser,User
 from datetime import datetime,timedelta
 
+
 class Reader(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     isfaculty=models.BooleanField()
     dept=models.CharField(max_length=50)
+    head_shot=models.ImageField(upload_to='profil_images',blank=True)
     
     def __str__(self):
-        return "Reader"+str(self.user.id)+' '+str(self.user.first_name)
+        return str(self.user.id)+str(self.user.username)
     @property
     def get_name(self):
         return self.user.first_name
@@ -21,7 +23,7 @@ class Reader_Pno(models.Model):
     pnumber=models.CharField(max_length=10)
 
     def __str__(self):
-        return "Reader_Pno"+str(self.pnumber)
+        return "Pno"+str(self.pnumber)
 
 class Book(models.Model): 
     isbn=models.CharField(max_length=30,primary_key=True,unique=True)
@@ -31,7 +33,7 @@ class Book(models.Model):
     edition=models.IntegerField()
     
     def __str__(self):
-        return "Book"+ str(self.isbn)+'['+str(self.title)+']'
+        return str(self.isbn)+'['+str(self.title)+']'
 
 class Book_Category(models.Model):
     catchoice= [
@@ -44,13 +46,13 @@ class Book_Category(models.Model):
     isbn=models.ForeignKey(Book,on_delete=models.CASCADE)
     category=models.CharField(max_length=30,choices=catchoice,default='education')
     def __str__(self):
-        return "Book_Category"+str(self.category)
+        return str(self.category)
 
 class Book_Author(models.Model):
     isbn=models.ForeignKey(Book,on_delete=models.CASCADE)
     author=models.CharField(max_length=30)
     def __str__(self):
-        return "Book_Author"+str(self.author)
+        return str(self.author)
 
 
 class Publisher(models.Model):
@@ -59,27 +61,27 @@ class Publisher(models.Model):
     year=models.IntegerField()
 
     def __str__(self):
-        return "Publisher"+str(self.pname)+' '+str(self.pid)
+        return str(self.pname)+' '+str(self.pid)
 
 class Staff(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)   
-
+    head_shot=models.ImageField(upload_to='profil_images',blank=True)
     def __str__(self):
-        return "Staff"+str(self.user.id)+' '+str(self.user.first_name)
+        return str(self.user.id)+' '+str(self.user.first_name)
 
 class KeepsTrack(models.Model):
     sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
     userid=models.ForeignKey(Reader,on_delete=models.CASCADE)
 
     def __str__(self):
-        return "KeepsTrack"+str(self.sid.id)+str(self.userid.id)
+        return str(self.sid.id)+str(self.userid.id)
 
 class PublishedBy(models.Model):
     isbn=models.ForeignKey(Book,on_delete=models.CASCADE)
     pid=models.ForeignKey(Publisher,on_delete=models.CASCADE)
 
     def __str__(self):
-        return "PublishedBy"+str(self.isbn.isbn)+' '+str(self.pid.pid)
+        return str(self.isbn.isbn)+' '+str(self.pid.pid)
 
 
 class Maintains(models.Model):
@@ -87,7 +89,7 @@ class Maintains(models.Model):
     sid=models.ForeignKey(Staff,on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Maintains"+str(self.isbn.isbn)+str(self.sid.id)
+        return str(self.isbn.isbn)+str(self.sid.id)
 
 def get_expiry():
     return datetime.today() + timedelta(days=15)
@@ -99,5 +101,5 @@ class IssuedTo(models.Model):
     returndate=models.DateField(default=get_expiry)
 
     def __str__(self):
-        return "IssuedTo"+str(self.userid.id)+str(self.isbn.isbn)
+        return str(self.userid.id)+str(self.isbn.isbn)
 

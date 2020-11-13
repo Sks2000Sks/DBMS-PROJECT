@@ -16,27 +16,31 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
-from library import views
+from library import views as lv
 from django.contrib.auth.views import LoginView,LogoutView
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home_view),
-    path('staffclick', views.staffclick_view),
-    path('studentclick', views.studentclick_view),
+    path('', lv.home_view),
+    path('staffclick', lv.staffclick_view),
+    path('studentclick', lv.studentclick_view),
 
-    path('staffsignup', views.staffsignup_view),
-    path('studentsignup', views.studentsignup_view),
+    path('staffsignup', lv.staffsignup_view),
+    path('studentsignup', lv.studentsignup_view),
 
-    path('stafflogin', LoginView.as_view(template_name='library/stafflogin.html')),
-    path('studentlogin', LoginView.as_view(template_name='library/studentlogin.html')),
+    #path('stafflogin', LoginView.as_view(template_name='library/stafflogin.html')),
+    path('stafflogin', lv.stafflogin),
+    #path('studentlogin', LoginView.as_view(template_name='library/studentlogin.html')),
+    path('studentlogin',lv.studentlogin),
 
     path('logout', LogoutView.as_view(template_name='library/index.html')),
-    path('afterlogin', views.afterlogin_view),
+    path('afterlogin', lv.afterlogin_view,name='afterlogin'),
 
-    path('addbook', views.addbook_view),
-    path('viewbook', views.viewbook_view),
-    path('issuebook', views.issuebook_view),
-    path('viewissuedbook', views.viewissuedbook_view),
-    path('viewstudent', views.viewstudent_view),
-    path('viewissuedbookbystudent', views.viewissuedbookbystudent),
+    path('addbook', lv.addbook_view),
+    path('viewbook',lv.viewbook_view),
+    path('issuebook',lv.issuebook_view),
+    path('viewissuedbook', lv.viewissuedbook_view),
+    path('viewstudent', lv.viewstudent_view),
+    path('viewissuedbookbystudent',lv.viewissuedbookbystudent),
+    
+    
 ]

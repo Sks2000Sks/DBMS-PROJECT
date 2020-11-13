@@ -1,23 +1,53 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from . import forms,models
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from datetime import datetime,timedelta,date
 from django.contrib.auth.decorators import login_required,user_passes_test
-# Create your views here.
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
+import os
+import face_recognition
+import cv2 
+import numpy
+
+
+
+""" def facedect(loc):
+        cam = cv2.VideoCapture(0)   
+        s, img = cam.read()
+        if s:    
+                BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                MEDIA_ROOT =os.path.join(BASE_DIR,'pages')
+                loc=(str(MEDIA_ROOT)+loc)
+                face_1_image = face_recognition.load_image_file(loc)
+                face_1_face_encoding = face_recognition.face_encodings(face_1_image)[0]
+                small_frame = cv2.resize(img, (0, 0), fx=0.25, fy=0.25)
+                rgb_small_frame = small_frame[:, :, ::-1]
+                face_locations = face_recognition.face_locations(rgb_small_frame)
+                face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+                check=face_recognition.compare_faces(face_1_face_encoding, face_encodings)
+                print(check)
+                if check[0]:
+                        return True
+                else :
+                        return False    
+ """
 def home_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
     return render(request,'library/index.html')
 
 
-#for showing signup/login button for student
 def studentclick_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
     return render(request,'library/studentclick.html')
 
-#for showing signup/login button for teacher
+
+
+
 def staffclick_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
@@ -25,20 +55,25 @@ def staffclick_view(request):
 
 
 def staffsignup_view(request):
-    form1=forms.StaffForm()
-    mydict={'form1':form1}
+    form1=forms.StaffUserForm()
+    form2=forms.StaffForm()
+    mydict={'form1':form1,'form2':form2}
     if request.method=='POST':
-        form1=forms.StaffForm(request.POST)
-        if form1.is_valid():
+        form1=forms.StaffUserForm(request.POST)
+        form2=forms.StaffForm(request.POST)
+        if form1.is_valid() and form2.is_valid():
             user=form1.save()
             user.set_password(user.password)
             user.save()
+
+            f2=form2.save(commit=False)
+            f2.user=user
+            f2.save()
+
             my_admin_group = Group.objects.get_or_create(name='ADMIN')
             my_admin_group[0].user_set.add(user)
             return HttpResponseRedirect('stafflogin')
     return render(request,'library/staffsignup.html',context=mydict)
-
-
 
 
 def studentsignup_view(request):
@@ -68,13 +103,56 @@ def studentsignup_view(request):
 def is_staff(user):
     return user.groups.filter(name='ADMIN').exists()
 
-
 def afterlogin_view(request):
     if is_staff(request.user):
         return render(request,'library/staffafterlogin.html')
     else:
         return render(request,'library/studentafterlogin.html')
 
+def stafflogin(request):
+    if request.method =="POST":
+                form =forms.LoginForm(request.POST)
+                if form.is_valid():
+                        username=request.POST['username']
+                        password=request.POST['password']
+                        user = authenticate(request,username=username,password=password)
+                        if user is not None:
+                                """  face=models.Staff.objects.get(user_id=user.id)
+                                if facedect(face.head_shot.url): """
+                                login(request,user)
+                                messages.success(request, "Successfully Logged In")
+                                return redirect('afterlogin')
+                        else:
+                                messages.error(request, "Invalid credentials! Please try again")
+                                return render(request,'library/loginfail.html')       
+                return render(request,'library/loginfail.html')
+    else:
+                form = forms.LoginForm()
+                return render(request,"library/stafflogin.html",{"form": form})  
+
+""" def loginfail(request):
+    return render(request,'loginfail.html',{}) """
+
+def studentlogin(request):
+    if request.method =="POST":
+                form =forms.LoginForm(request.POST)
+                if form.is_valid():
+                        username=request.POST['username']
+                        password=request.POST['password']
+                        user = authenticate(username=username,password=password)
+                        if user is not None:
+                            """ face=models.Reader.objects.get(user_id=user.id)
+                            if facedect(face.head_shot.url): """
+                            login(request,user)
+                            messages.success(request, "Successfully Logged In")
+                            return redirect('afterlogin')
+                        else:
+                                messages.error(request, "Invalid credentials! Please try again")
+                                return redirect('library/loginfail.html')    
+                return redirect('library/loginfail.html')    
+    else:
+                form = forms.LoginForm()
+                return render(request,"library/studentlogin.html",{"form": form}) 
 
 
 @login_required(login_url='stafflogin')
@@ -121,7 +199,6 @@ def issuebook_view(request):
             return render(request,'library/bookissued.html')
     return render(request,'library/issuebook.html',{'form':form})
 
-
 @login_required(login_url='stafflogin')
 @user_passes_test(is_staff)
 def viewissuedbook_view(request):
@@ -157,8 +234,8 @@ def viewstudent_view(request):
 
 @login_required(login_url='studentlogin')
 def viewissuedbookbystudent(request):
-    student=models.Reader.objects.filter(user_id=request.user.id)
-    issuedbook=models.IssuedTo.objects.filter(isbn=student[0].userid)
+    #student=models.Reader.objects.filter(user_id=request.user.id)
+    issuedbook=models.IssuedTo.objects.filter(userid=request.user.id)
 
     li1=[]
 
@@ -166,7 +243,7 @@ def viewissuedbookbystudent(request):
     for ib in issuedbook:
         books=models.Book.objects.filter(isbn=ib.isbn)
         for book in books:
-            t=(request.user,student[0].userid,student[0].dept,book.title,book.isbn)
+            t=(request.user.username,book.title,book.isbn)
             li1.append(t)
         
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
@@ -180,5 +257,4 @@ def viewissuedbookbystudent(request):
             fine=day*10
         t=(issdate,expdate,fine)
         li2.append(t)
-
     return render(request,'library/viewissuedbookbystudent.html',{'li1':li1,'li2':li2})

@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from . import models
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
 #d
 class ReaderUserForm(forms.ModelForm):
     class Meta:
@@ -10,7 +12,7 @@ class ReaderUserForm(forms.ModelForm):
 class ReaderForm(forms.ModelForm):
     class Meta:
         model=models.Reader
-        fields=['isfaculty','dept']
+        fields=['isfaculty','dept','head_shot']
 #d
 class Reader_PnoForm(forms.ModelForm):
     class Meta:
@@ -37,8 +39,12 @@ class PublisherForm(forms.ModelForm):
         model=models.Publisher
         fields='__all__'
 
-#d
 class StaffForm(forms.ModelForm):
+    class Meta:
+        model=models.Staff
+        fields=['head_shot']
+
+class StaffUserForm(forms.ModelForm):
     class Meta:
         model=User
         fields=['first_name','last_name','username','email','password']
@@ -63,3 +69,6 @@ class IssuedToForm(forms.ModelForm):
         model=models.IssuedTo
         fields='__all__'
 
+class LoginForm(forms.Form):
+   username = forms.CharField(max_length = 100,)
+   password = forms.CharField()

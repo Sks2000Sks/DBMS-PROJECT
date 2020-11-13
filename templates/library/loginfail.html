@@ -3,26 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>StaffSignUp</title>
+    <title>Student Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
-
-
-
-
-
-
-
-
     <style type="text/css">
     	body {
     		color: #aa082e;
-    	background-color:#b6bde7;
+    			background-color:#b6bde7;
     		font-family: 'Roboto', sans-serif;
     	}
         .form-control {
@@ -95,59 +85,16 @@
     	}
     </style>
 
-
-
-
-
-
   </head>
   <body>
-    {% include "library/navbar.html" %}
+    {% include "library/navbarstaff.html" %}
     <br>
     <br>
-<center><h3 style=" margin-bottom: 0px;"class = 'alert alert-success'>Signup As Staff!</h3></center>
-    <div class="signup-form">
-        <form  method="post" class="form-horizontal">
 
-    			<center><h2>Staff Signup</h2></center>
-
-			      {% csrf_token %}
-            {% for field in form1 %}
-            <div class="form-group">
-              <label class="control-label col-xs-4">{{ field.label_tag }}</label>
-              <div class="col-xs-8">
-              {{ field }}
-               </div>
-            </div>
-            {% endfor %}
-            
-            <div class="form-group">
-              <label class="control-label col-xs-4">Profile Picture</label>
-              <div class="col-xs-8">
-              {{ form2.head_shot }}
-               </div>
-            </div>
-            {% comment %} <div class="form-group">
-              <label class="control-label col-xs-4">Login ID</label>
-              <div class="col-xs-8">
-              {{ form2.loginid }}
-               </div>
-            </div> {% endcomment %}
-            
-            
-          
-
-    		<div class="form-group">
-    			<div class="col-xs-8 col-xs-offset-4">
-            <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
-    			</div>
-    		</div>
-        </form>
-    	<div class="text-center">Already have an account? <a href="stafflogin">Login here</a></div>
-    </div>
-
-
-
-    {% include "library/footer.html" %}
+<h3 class="p-3 mb-2 bg-primary text-white" style = 'font-size: 50px;text-align:center;'>LOGIN FAILED</h3>
+<br><br>
+<center><h3 style=" margin-bottom: 0px;"class = 'alert alert-success'>LOGIN FAILED</h3></center>
+<br>
+{% include "library/footer.html" %}
   </body>
 </html>
