@@ -14,7 +14,7 @@ import numpy
 
 
 
-""" def facedect(loc):
+def facedect(loc):
         cam = cv2.VideoCapture(0)   
         s, img = cam.read()
         if s:    
@@ -33,7 +33,7 @@ import numpy
                         return True
                 else :
                         return False    
- """
+
 def home_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
@@ -117,11 +117,11 @@ def stafflogin(request):
                         password=request.POST['password']
                         user = authenticate(request,username=username,password=password)
                         if user is not None:
-                                """  face=models.Staff.objects.get(user_id=user.id)
-                                if facedect(face.head_shot.url): """
-                                login(request,user)
-                                messages.success(request, "Successfully Logged In")
-                                return redirect('afterlogin')
+                                face=models.Staff.objects.get(user_id=user.id)
+                                if facedect(face.head_shot.url):
+                                    login(request,user)
+                                    messages.success(request, "Successfully Logged In")
+                                    return redirect('afterlogin')
                         else:
                                 messages.error(request, "Invalid credentials! Please try again")
                                 return render(request,'library/loginfail.html')       
@@ -141,11 +141,11 @@ def studentlogin(request):
                         password=request.POST['password']
                         user = authenticate(username=username,password=password)
                         if user is not None:
-                            """ face=models.Reader.objects.get(user_id=user.id)
-                            if facedect(face.head_shot.url): """
-                            login(request,user)
-                            messages.success(request, "Successfully Logged In")
-                            return redirect('afterlogin')
+                            face=models.Reader.objects.get(user_id=user.id)#user_id=request.user.id
+                            if facedect(face.head_shot.url): 
+                                login(request,user)
+                                messages.success(request, "Successfully Logged In")
+                                return redirect('afterlogin')
                         else:
                                 messages.error(request, "Invalid credentials! Please try again")
                                 return redirect('library/loginfail.html')    
